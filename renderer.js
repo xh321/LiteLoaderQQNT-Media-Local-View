@@ -271,7 +271,7 @@ export async function onConfigView(view) {
         q_switch_localPic.classList.toggle("is-active");
         await window.media_local_view.saveConfig(nowConfig);
     });
-        
+
     //本地视频开关
     var q_switch_localVideo = node2.querySelector("#switchUseLocalVideo");
 
@@ -288,9 +288,52 @@ export async function onConfigView(view) {
         q_switch_localVideo.classList.toggle("is-active");
         await window.media_local_view.saveConfig(nowConfig);
     });
-    
+
     view.appendChild(node2);
 }
 
 export async function onLoad() {
+    var observerRendering = false;
+    const observer = new MutationObserver(async (mutationsList) => {
+        for (let mutation of mutationsList) {
+            if (mutation.type === "childList") {
+                if (observerRendering) continue;
+                observerRendering = true;
+                setTimeout(() => {
+                    observerRendering = false;
+                    render();
+                }, 50);
+            }
+        }
+    });
+
+    var finder = setInterval(() => {
+        if (document.querySelector(".ml-list.list")) {
+            clearInterval(finder);
+            console.log(
+                "[Media-Local-View]",
+                "检测到聊天区域，已在当前页面加载视频下载辅助"
+            );
+            const targetNode = document.querySelector(".ml-list.list");
+            const config = {
+                attributes: false,
+                childList: true,
+                subtree: true
+            };
+            observer.observe(targetNode, config);
+        }
+    }, 100);
+
+    function render() {
+        var elements = document
+            .querySelector(".chat-msg-area__vlist")
+            .querySelectorAll(".video-element");
+
+        for (var video of elements) {
+            let downloadBtn = video.querySelector(".file-progress");
+            video.onclick = () => {
+                downloadBtn.click();
+            };
+        }
+    }
 }
