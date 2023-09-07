@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "type": "extension",
+    "name": "本地查看图片和视频",
+    "slug": "media_local_view",
+    "description": "绕过QQ自带的媒体预览，直接用默认图片查看器或视频播放器查看图片或视频",
+    "version": "0.1.0",
+    "thumbnail": "./icon.png",
+    "author": {
+        "name": "XiaoHe321",
+        "link": "https://github.com/xh321"
+    },
+    "repository": {
+        "repo": "xh321/LiteLoaderQQNT-Media-Local-View",
+        "branch": "master",
+        "use_release": {
+            "tag": "latest",
+            "name": "media-local-view.zip"
+        }
+    },
+    "platform": ["win32", "darwin", "linux"],
+    "injects": {
+        "main": "./main.js",
+        "preload": "./preload.js",
+        "renderer": "./renderer.js"
+    }
+}
