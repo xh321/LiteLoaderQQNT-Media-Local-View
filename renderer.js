@@ -327,7 +327,7 @@ export async function onLoad() {
     function render() {
         var elements = document
             .querySelector(".chat-msg-area__vlist")
-            .querySelectorAll(".video-element");
+            .querySelectorAll(".msg-preview--video");
 
         for (var video of elements) {
             let downloadBtn = video.querySelector(".file-progress");
