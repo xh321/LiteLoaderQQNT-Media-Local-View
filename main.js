@@ -29,7 +29,9 @@ function loadConfig() {
     }
 }
 
-function onLoad(plugin) {
+onLoad();
+
+function onLoad() {
     ipcMain.handle(
         "LiteLoader.media_local_view.getNowConfig",
         async (event, message) => {
@@ -49,10 +51,10 @@ function onLoad(plugin) {
         }
     );
 
-    if (!fs.existsSync(plugin.path.data)) {
-        fs.mkdirSync(plugin.path.data, { recursive: true });
+    if (!fs.existsSync(LiteLoader.path.data)) {
+        fs.mkdirSync(LiteLoader.path.data, { recursive: true });
     }
-    configFilePath = path.join(plugin.path.data, "config.json");
+    configFilePath = path.join(LiteLoader.path.data, "config.json");
     nowConfig = loadConfig();
 
     if (nowConfig.localVideo == null) {
@@ -165,6 +167,5 @@ function output(...args) {
 }
 
 module.exports = {
-    onLoad,
     onBrowserWindowCreated
 };

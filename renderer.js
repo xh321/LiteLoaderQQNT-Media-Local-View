@@ -1,6 +1,6 @@
 var nowConfig = {};
 
-export async function onConfigView(view) {
+export async function onSettingWindowCreated(view) {
     nowConfig = await window.media_local_view.getNowConfig();
 
     const new_navbar_item = `
@@ -292,7 +292,9 @@ export async function onConfigView(view) {
     view.appendChild(node2);
 }
 
-export async function onLoad() {
+onLoad();
+
+async function onLoad() {
     var observerRendering = false;
     const observer = new MutationObserver(async (mutationsList) => {
         for (let mutation of mutationsList) {
