@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const opn = require("opn");
+const opn = require("open");
 const { ipcMain } = require("electron");
 
 var configFilePath = "";
