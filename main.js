@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const opn = require("open");
 const { ipcMain } = require("electron");
 
 var configFilePath = "";
@@ -141,16 +140,25 @@ function onBrowserWindowCreated(window) {
                 }
             }
 
-            function localOpen(path) {
-                if (fs.existsSync(path)) {
-                    opn(path);
-                } else {
-                    var interval = setInterval(() => {
-                        if (fs.existsSync(path)) {
-                            clearInterval(interval);
-                            opn(path);
-                        }
-                    }, 100);
+            async function localOpen(path) {
+                var open = (await import("open")).default;
+                try {
+                    if (fs.existsSync(path)) {
+                        await open(path);
+                    } else {
+                        var interval = setInterval(async () => {
+                            if (fs.existsSync(path)) {
+                                clearInterval(interval);
+                                await open(path);
+                            }
+                        }, 100);
+                    }
+                } catch (e) {
+                    output(
+                        "NTQQ Image-Local-View Error: ",
+                        e,
+                        "Please report this to https://github.com/xh321/LiteLoaderQQNT-Image-Local-View/issues, thank you"
+                    );
                 }
             }
 
