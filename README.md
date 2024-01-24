@@ -5,7 +5,7 @@ LiteLoaderQQNT插件，用于绕过QQ自带的媒体预览，直接用默认图�
 
 ## 使用方法
 
-*建议从`LiteLoaderQQNT`应用商店中直接下载安装，方便快捷。*（新版本1.0`LiteLoaderQQNT`没有插件商店了，请遵循[手动安装方法](https://liteloaderqqnt.github.io/guide/plugins.html)）
+*建议从`LiteLoaderQQNT`应用商店中直接下载安装，方便快捷。*（新版本1.0`LiteLoaderQQNT`没有插件商店了，请遵循下面的手动安装方法）
 
 **手动安装**：请前往[版本发布页面](https://github.com/xh321/LiteLoaderQQNT-Media-Local-View/releases)下载最新版压缩包（`media-local-view.zip`），在`LiteLoaderQQNT数据目录/plugins/`下面新建文件夹（名称任意，建议为插件名称），蒋插件压缩包里的内容解压进去，重启QQNT即可。
 
