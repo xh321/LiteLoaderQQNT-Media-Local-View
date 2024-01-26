@@ -303,15 +303,15 @@ export async function onSettingWindowCreated(view) {
     //macOS内置预览开关
     var q_switch_macOSBuiltinPreview = node2.querySelector("#switchUseMacOSBuiltinPreview");
 
-    if (nowConfig.localPic == null || nowConfig.localPic == true) {
+    if (nowConfig.macOSBuiltinPreview == null || nowConfig.macOSBuiltinPreview == true) {
         q_switch_macOSBuiltinPreview.classList.toggle("is-active");
     }
 
     q_switch_macOSBuiltinPreview.addEventListener("click", async () => {
         if (q_switch_macOSBuiltinPreview.classList.contains("is-active")) {
-            nowConfig.localPic = false;
+            nowConfig.macOSBuiltinPreview = false;
         } else {
-            nowConfig.localPic = true;
+            nowConfig.macOSBuiltinPreview = true;
         }
         q_switch_macOSBuiltinPreview.classList.toggle("is-active");
         await window.media_local_view.saveConfig(nowConfig);
