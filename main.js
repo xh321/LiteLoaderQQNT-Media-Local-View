@@ -6,7 +6,8 @@ var configFilePath = "";
 
 var sampleConfig = {
     localVideo: true,
-    localPic: true
+    localPic: true,
+    macOSBuiltinPreview: false
 };
 
 var nowConfig = {};
@@ -141,7 +142,9 @@ function onBrowserWindowCreated(window) {
             }
 
             async function localOpen(path) {
-                var open = (await import("open")).default;
+                var open = nowConfig.macOSBuiltinPreview == true ?
+                    (await import("open")).default
+                    : async (path) => window.previewFile(path);
                 try {
                     if (fs.existsSync(path)) {
                         await open(path);
@@ -164,7 +167,7 @@ function onBrowserWindowCreated(window) {
 
             output(
                 "NTQQ Image-Local-View for window: " +
-                    window.webContents.getURL()
+                window.webContents.getURL()
             );
         }
     });

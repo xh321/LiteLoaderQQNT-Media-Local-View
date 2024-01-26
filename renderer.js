@@ -32,6 +32,17 @@ export async function onSettingWindowCreated(view) {
                 </div>
               </div>
 
+            <hr class="horizontal-dividing-line" />
+              <div class="vertical-list-item">
+                <div style="width:90%;" >
+                  <h2>是否在macOS使用内置quicklook预览</h2>
+                  <span class="secondary-text">访达中的空格快速预览，只对macOS有效</span>
+                </div>
+                <div id="switchUseMacOSBuiltinPreview" class="q-switch">
+                  <span class="q-switch__handle"></span>
+                </div>
+              </div>
+
 
             </div>
 
@@ -286,6 +297,23 @@ export async function onSettingWindowCreated(view) {
             nowConfig.localVideo = true;
         }
         q_switch_localVideo.classList.toggle("is-active");
+        await window.media_local_view.saveConfig(nowConfig);
+    });
+
+    //macOS内置预览开关
+    var q_switch_macOSBuiltinPreview = node2.querySelector("#switchUseMacOSBuiltinPreview");
+
+    if (nowConfig.localPic == null || nowConfig.localPic == true) {
+        q_switch_macOSBuiltinPreview.classList.toggle("is-active");
+    }
+
+    q_switch_macOSBuiltinPreview.addEventListener("click", async () => {
+        if (q_switch_macOSBuiltinPreview.classList.contains("is-active")) {
+            nowConfig.localPic = false;
+        } else {
+            nowConfig.localPic = true;
+        }
+        q_switch_macOSBuiltinPreview.classList.toggle("is-active");
         await window.media_local_view.saveConfig(nowConfig);
     });
 
