@@ -11,7 +11,7 @@ LiteLoaderQQNT插件，用于绕过QQ自带的媒体预览，直接用默认图�
 
 **版本不兼容提示**：从0.1.3起，插件已适配1.0版本以上`LiteLoaderQQNT`框架，同时不再兼容旧版框架，请遵循[安装方法](https://liteloaderqqnt.github.io/guide/install.html)更新框架。
 
-
+**版本提示**：从0.1.6起，配置文件移动了位置（之前的位置是错误的），请在更新本版本后重新配置插件。
 
 
 

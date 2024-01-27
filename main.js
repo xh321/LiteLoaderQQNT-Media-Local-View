@@ -4,6 +4,8 @@ const { ipcMain } = require("electron");
 
 var configFilePath = "";
 
+var pluginDataDir = path.join(LiteLoader.path.data, "media_local_view");
+
 var sampleConfig = {
     localVideo: true,
     localPic: true
@@ -50,10 +52,10 @@ function onLoad() {
         }
     );
 
-    if (!fs.existsSync(LiteLoader.path.data)) {
-        fs.mkdirSync(LiteLoader.path.data, { recursive: true });
+    if (!fs.existsSync(pluginDataDir)) {
+        fs.mkdirSync(pluginDataDir, { recursive: true });
     }
-    configFilePath = path.join(LiteLoader.path.data, "config.json");
+    configFilePath = path.join(pluginDataDir, "config.json");
     nowConfig = loadConfig();
 
     if (nowConfig.localVideo == null) {
