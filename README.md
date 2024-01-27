@@ -3,6 +3,8 @@
 LiteLoaderQQNT插件，用于绕过QQ自带的媒体预览，直接用默认图片查看器或视频播放器查看图片或视频
 使用前需要安装[LiteLoaderQQNT](https://github.com/mo-jinran/LiteLoaderQQNT)，并在QQNT新版上使用。
 
+建议加入更新日志频道，接收最新更新和使用提示[https://t.me/llqqnt_xh](https://t.me/llqqnt_xh)。
+
 ## 使用方法
 
 *建议从`LiteLoaderQQNT`应用商店中直接下载安装，方便快捷。*（新版本1.0`LiteLoaderQQNT`没有插件商店了，请遵循下面的手动安装方法）
