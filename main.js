@@ -8,7 +8,8 @@ var pluginDataDir = path.join(LiteLoader.path.data, "media_local_view");
 
 var sampleConfig = {
     localVideo: true,
-    localPic: true
+    localPic: true,
+    macOSBuiltinPreview: true
 };
 
 var nowConfig = {};
@@ -63,6 +64,9 @@ function onLoad() {
     }
     if (nowConfig.localPic == null) {
         nowConfig.localPic = true;
+    }
+    if (nowConfig.localPic == null) {
+        nowConfig.macOSBuiltinPreview = true;
     }
 
     fs.writeFileSync(
@@ -144,14 +148,22 @@ function onBrowserWindowCreated(window) {
 
             async function localOpen(path) {
                 var open = (await import("open")).default;
+                var openOrPreview = async (path) => {
+                    if (nowConfig.macOSBuiltinPreview == true && process.platform == "darwin") {
+                        window.previewFile(path);
+                    }
+                    else {
+                        await open(path);
+                    }
+                }
                 try {
                     if (fs.existsSync(path)) {
-                        await open(path);
+                        await openOrPreview(path);
                     } else {
                         var interval = setInterval(async () => {
                             if (fs.existsSync(path)) {
                                 clearInterval(interval);
-                                await open(path);
+                                await openOrPreview(path);
                             }
                         }, 100);
                     }
@@ -166,7 +178,7 @@ function onBrowserWindowCreated(window) {
 
             output(
                 "NTQQ Image-Local-View for window: " +
-                    window.webContents.getURL()
+                window.webContents.getURL()
             );
         }
     });
