@@ -116,8 +116,9 @@ function onBrowserWindowCreated(window) {
                             args[0][1][1] != null
                         ) {
                             var mediaList = args[0][1][1].mediaList;
+                            var openedPicIndex = args[0][1][1].index;
                             if (mediaList != null && mediaList.length > 0) {
-                                var picPath = mediaList[0]?.context?.sourcePath;
+                                var picPath = mediaList[openedPicIndex]?.context?.sourcePath;
                                 if (
                                     picPath != null &&
                                     nowConfig.localPic == true
@@ -126,7 +127,7 @@ function onBrowserWindowCreated(window) {
                                     args[0].pop();
                                 }
                                 var videoPath =
-                                    mediaList[0]?.context?.video?.path;
+                                    mediaList[openedPicIndex]?.context?.video?.path;
                                 if (
                                     videoPath != null &&
                                     nowConfig.localVideo == true
