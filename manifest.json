@@ -16,7 +16,7 @@
         "repo": "xh321/LiteLoaderQQNT-Media-Local-View",
         "branch": "master",
         "release": {
-            "tag": "latest",
+            "tag": "0.1.8",
             "file": "media-local-view.zip"
         }
     },
