@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const { ipcMain } = require("electron");
+const { shell, dialog, ipcMain } = require("electron");
 
 var configFilePath = "";
 
@@ -118,7 +118,9 @@ function onBrowserWindowCreated(window) {
                             var mediaList = args[0][1][1].mediaList;
                             var openedPicIndex = args[0][1][1].index;
                             if (mediaList != null && mediaList.length > 0) {
-                                var picPath = mediaList[openedPicIndex]?.context?.sourcePath;
+                                var picPath =
+                                    mediaList[openedPicIndex]?.context
+                                        ?.sourcePath;
                                 if (
                                     picPath != null &&
                                     nowConfig.localPic == true
@@ -127,7 +129,8 @@ function onBrowserWindowCreated(window) {
                                     args[0].pop();
                                 }
                                 var videoPath =
-                                    mediaList[openedPicIndex]?.context?.video?.path;
+                                    mediaList[openedPicIndex]?.context?.video
+                                        ?.path;
                                 if (
                                     videoPath != null &&
                                     nowConfig.localVideo == true
@@ -148,15 +151,24 @@ function onBrowserWindowCreated(window) {
             }
 
             async function localOpen(path) {
-                var open = (await import("open")).default;
                 var openOrPreview = async (path) => {
-                    if (nowConfig.macOSBuiltinPreview == true && process.platform == "darwin") {
+                    if (
+                        nowConfig.macOSBuiltinPreview == true &&
+                        process.platform == "darwin"
+                    ) {
                         window.previewFile(path);
+                    } else {
+                        var ret = await shell.openPath(path);
+                        if (ret != "") {
+                            dialog.showMessageBox({
+                                type: "error",
+                                title: "错误",
+                                message: "打开图片错误，错误原因：" + ret,
+                                buttons: ["确定"]
+                            });
+                        }
                     }
-                    else {
-                        await open(path);
-                    }
-                }
+                };
                 try {
                     if (fs.existsSync(path)) {
                         await openOrPreview(path);
@@ -179,7 +191,7 @@ function onBrowserWindowCreated(window) {
 
             output(
                 "NTQQ Image-Local-View for window: " +
-                window.webContents.getURL()
+                    window.webContents.getURL()
             );
         }
     });
