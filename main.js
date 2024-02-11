@@ -103,7 +103,6 @@ function onBrowserWindowCreated(window) {
 
       function ipc_message(_, status, name, ...args) {
         try {
-          console.log(JSON.stringify(args));
           if (args != null) {
             if (
               args.length == 1 &&
