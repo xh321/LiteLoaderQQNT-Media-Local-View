@@ -1,20 +1,27 @@
 const fs = require("fs");
 const path = require("path");
-const { shell, dialog, ipcMain } = require("electron");
+const net = require("net");
+const os = require("os");
+const exec = require("child_process").exec;
+const { shell, dialog, ipcMain, app } = require("electron");
 
 var configFilePath = "";
-
+var pipePath = null;
 var pluginDataDir = path.join(LiteLoader.path.data, "media_local_view");
 
 var sampleConfig = {
   localVideo: true,
   localPic: true,
   macOSBuiltinPreview: true,
+  windowsQuickLook: false,
 };
 
 var nowConfig = {};
 
 function initConfig() {
+  if (!fs.existsSync(pluginDataDir)) {
+    fs.mkdirSync(pluginDataDir, { recursive: true });
+  }
   fs.writeFileSync(
     configFilePath,
     JSON.stringify(sampleConfig, null, 2),
@@ -31,6 +38,87 @@ function loadConfig() {
   }
 }
 
+function saveConfig() {
+  if (!fs.existsSync(configFilePath)) {
+    initConfig();
+  }
+  fs.writeFileSync(configFilePath, JSON.stringify(nowConfig, null, 2), "utf-8");
+}
+
+async function useWindowsQuickLookInner(url) {
+  return new Promise(async (accept, reject) => {
+    //适配Windows QuickLook
+    try {
+      pipePath =
+        process.platform === "win32"
+          ? path.join(
+              "\\\\.\\pipe\\",
+              `QuickLook.App.Pipe.${await getUserSid()}`
+            )
+          : null;
+
+      if (pipePath != null) {
+        pipeClient = net.createConnection(pipePath, () => {
+          pipeClient.write(`QuickLook.App.PipeMessages.Toggle|${url}`);
+        });
+        pipeClient.on("connect", () => {
+          output("Windows QuickLook pipe connected");
+          accept();
+        });
+        pipeClient.on("error", (err) => {
+          output("Windows QuickLook pipe error occured", err);
+          reject(
+            "连接 Windows QuickLook 出现错误，请确保它已经在后台运行：" +
+              JSON.stringify(err)
+          );
+        });
+        pipeClient.on("close", () => {
+          output("Windows QuickLook pipe disconnected");
+        });
+      } else {
+        pipeClient = null;
+        nowConfig.windowsQuickLook = false;
+        saveConfig();
+        reject("仅支持Windows系统");
+      }
+    } catch (err) {
+      output("Windows QuickLook pipe error occured", err);
+      pipeClient = null;
+      nowConfig.windowsQuickLook = false;
+      saveConfig();
+      reject(
+        "连接 Windows QuickLook 出现错误，请确保它已经在后台运行：" +
+          JSON.stringify(err)
+      );
+    }
+  });
+}
+
+async function useWindowsQuickLook(url) {
+  try {
+    await useWindowsQuickLookInner(url);
+  } catch (err) {
+    app.whenReady().then(() => {
+      dialog.showMessageBox({
+        type: "error",
+        title: "错误",
+        message:
+          err +
+          "。因为出错，已自动关闭 Windows QuickLook 支持，请检查环境后手动重新开启。",
+        buttons: ["确定"],
+      });
+    });
+  }
+}
+
+async function getUserSid() {
+  return new Promise((accept) => {
+    exec("whoami /user", (error, stdout, stderr) => {
+      accept(stdout.match(/S-\d-\d+-(\d+-){1,14}\d+/)[0]);
+    });
+  });
+}
+
 onLoad();
 
 function onLoad() {
@@ -45,17 +133,10 @@ function onLoad() {
     "LiteLoader.media_local_view.saveConfig",
     async (event, config) => {
       nowConfig = config;
-      fs.writeFileSync(
-        configFilePath,
-        JSON.stringify(config, null, 2),
-        "utf-8"
-      );
+      saveConfig();
     }
   );
 
-  if (!fs.existsSync(pluginDataDir)) {
-    fs.mkdirSync(pluginDataDir, { recursive: true });
-  }
   configFilePath = path.join(pluginDataDir, "config.json");
   nowConfig = loadConfig();
 
@@ -145,13 +226,18 @@ function onBrowserWindowCreated(window) {
             process.platform == "darwin"
           ) {
             window.previewFile(path);
+          } else if (
+            nowConfig.windowsQuickLook == true &&
+            process.platform == "win32"
+          ) {
+            await useWindowsQuickLook(path);
           } else {
             var ret = await shell.openPath(path);
             if (ret != "") {
               dialog.showMessageBox({
                 type: "error",
                 title: "错误",
-                message: "打开图片错误，错误原因：" + ret,
+                message: "打开图片或视频错误，错误原因：" + ret,
                 buttons: ["确定"],
               });
             }

@@ -1,9 +1,9 @@
 var nowConfig = {};
 
 export async function onSettingWindowCreated(view) {
-    nowConfig = await window.media_local_view.getNowConfig();
+  nowConfig = await window.media_local_view.getNowConfig();
 
-    const new_navbar_item = `
+  const new_navbar_item = `
     <body>
       <div class="config_view">
         <section class="path">
@@ -32,11 +32,22 @@ export async function onSettingWindowCreated(view) {
                 </div>
               </div>
 
+              <hr class="horizontal-dividing-line" />
+              <div class="vertical-list-item">
+                <div style="width:90%;" >
+                  <h2>是否在Windows使用外置QuickLook预览</h2>
+                  <span class="secondary-text">使用QuickLook for Windows，只对Windows有效。项目地址：https://github.com/QL-Win/QuickLook</span>
+                </div>
+                <div id="switchUseWindowsQLPreview" class="q-switch">
+                  <span class="q-switch__handle"></span>
+                </div>
+              </div>
+
             <hr class="horizontal-dividing-line" />
               <div class="vertical-list-item">
                 <div style="width:90%;" >
-                  <h2>是否在macOS使用内置quicklook预览</h2>
-                  <span class="secondary-text">访达中的空格快速预览，只对macOS有效</span>
+                  <h2>是否在macOS使用内置QuickLook预览</h2>
+                  <span class="secondary-text">使用访达中的空格快速预览窗口，只对macOS有效</span>
                 </div>
                 <div id="switchUseMacOSBuiltinPreview" class="q-switch">
                   <span class="q-switch__handle"></span>
@@ -261,109 +272,133 @@ export async function onSettingWindowCreated(view) {
     </body>
   `;
 
-    const parser = new DOMParser();
+  const parser = new DOMParser();
 
-    const doc2 = parser.parseFromString(new_navbar_item, "text/html");
-    const node2 = doc2.querySelector("body > div");
+  const doc2 = parser.parseFromString(new_navbar_item, "text/html");
+  const node2 = doc2.querySelector("body > div");
 
-    //本地图片开关
-    var q_switch_localPic = node2.querySelector("#switchUseLocalPic");
+  //本地图片开关
+  var q_switch_localPic = node2.querySelector("#switchUseLocalPic");
 
-    if (nowConfig.localPic == null || nowConfig.localPic == true) {
-        q_switch_localPic.classList.toggle("is-active");
+  if (nowConfig.localPic == null || nowConfig.localPic == true) {
+    q_switch_localPic.classList.toggle("is-active");
+  }
+
+  q_switch_localPic.addEventListener("click", async () => {
+    if (q_switch_localPic.classList.contains("is-active")) {
+      nowConfig.localPic = false;
+    } else {
+      nowConfig.localPic = true;
     }
+    q_switch_localPic.classList.toggle("is-active");
+    await window.media_local_view.saveConfig(nowConfig);
+  });
 
-    q_switch_localPic.addEventListener("click", async () => {
-        if (q_switch_localPic.classList.contains("is-active")) {
-            nowConfig.localPic = false;
-        } else {
-            nowConfig.localPic = true;
-        }
-        q_switch_localPic.classList.toggle("is-active");
-        await window.media_local_view.saveConfig(nowConfig);
-    });
+  //本地视频开关
+  var q_switch_localVideo = node2.querySelector("#switchUseLocalVideo");
 
-    //本地视频开关
-    var q_switch_localVideo = node2.querySelector("#switchUseLocalVideo");
+  if (nowConfig.localVideo == null || nowConfig.localVideo == true) {
+    q_switch_localVideo.classList.toggle("is-active");
+  }
 
-    if (nowConfig.localVideo == null || nowConfig.localVideo == true) {
-        q_switch_localVideo.classList.toggle("is-active");
+  q_switch_localVideo.addEventListener("click", async () => {
+    if (q_switch_localVideo.classList.contains("is-active")) {
+      nowConfig.localVideo = false;
+    } else {
+      nowConfig.localVideo = true;
     }
+    q_switch_localVideo.classList.toggle("is-active");
+    await window.media_local_view.saveConfig(nowConfig);
+  });
 
-    q_switch_localVideo.addEventListener("click", async () => {
-        if (q_switch_localVideo.classList.contains("is-active")) {
-            nowConfig.localVideo = false;
-        } else {
-            nowConfig.localVideo = true;
-        }
-        q_switch_localVideo.classList.toggle("is-active");
-        await window.media_local_view.saveConfig(nowConfig);
-    });
+  //Windows外置预览开关
+  var q_switch_windowsQLPreview = node2.querySelector(
+    "#switchUseWindowsQLPreview"
+  );
 
-    //macOS内置预览开关
-    var q_switch_macOSBuiltinPreview = node2.querySelector("#switchUseMacOSBuiltinPreview");
+  if (nowConfig.windowsQuickLook == true) {
+    q_switch_windowsQLPreview.classList.toggle("is-active");
+  }
 
-    if (nowConfig.macOSBuiltinPreview == null || nowConfig.macOSBuiltinPreview == true) {
-        q_switch_macOSBuiltinPreview.classList.toggle("is-active");
+  q_switch_windowsQLPreview.addEventListener("click", async () => {
+    if (q_switch_windowsQLPreview.classList.contains("is-active")) {
+      nowConfig.windowsQuickLook = false;
+    } else {
+      nowConfig.windowsQuickLook = true;
     }
+    q_switch_windowsQLPreview.classList.toggle("is-active");
+    await window.media_local_view.saveConfig(nowConfig);
+  });
 
-    q_switch_macOSBuiltinPreview.addEventListener("click", async () => {
-        if (q_switch_macOSBuiltinPreview.classList.contains("is-active")) {
-            nowConfig.macOSBuiltinPreview = false;
-        } else {
-            nowConfig.macOSBuiltinPreview = true;
-        }
-        q_switch_macOSBuiltinPreview.classList.toggle("is-active");
-        await window.media_local_view.saveConfig(nowConfig);
-    });
+  //macOS内置预览开关
+  var q_switch_macOSBuiltinPreview = node2.querySelector(
+    "#switchUseMacOSBuiltinPreview"
+  );
 
-    view.appendChild(node2);
+  if (
+    nowConfig.macOSBuiltinPreview == null ||
+    nowConfig.macOSBuiltinPreview == true
+  ) {
+    q_switch_macOSBuiltinPreview.classList.toggle("is-active");
+  }
+
+  q_switch_macOSBuiltinPreview.addEventListener("click", async () => {
+    if (q_switch_macOSBuiltinPreview.classList.contains("is-active")) {
+      nowConfig.macOSBuiltinPreview = false;
+    } else {
+      nowConfig.macOSBuiltinPreview = true;
+    }
+    q_switch_macOSBuiltinPreview.classList.toggle("is-active");
+    await window.media_local_view.saveConfig(nowConfig);
+  });
+
+  view.appendChild(node2);
 }
 
 onLoad();
 
 async function onLoad() {
-    var observerRendering = false;
-    const observer = new MutationObserver(async (mutationsList) => {
-        for (let mutation of mutationsList) {
-            if (mutation.type === "childList") {
-                if (observerRendering) continue;
-                observerRendering = true;
-                setTimeout(() => {
-                    observerRendering = false;
-                    render();
-                }, 50);
-            }
-        }
-    });
-
-    var finder = setInterval(() => {
-        if (document.querySelector(".ml-list.list")) {
-            clearInterval(finder);
-            console.log(
-                "[Media-Local-View]",
-                "检测到聊天区域，已在当前页面加载视频下载辅助"
-            );
-            const targetNode = document.querySelector(".ml-list.list");
-            const config = {
-                attributes: false,
-                childList: true,
-                subtree: true
-            };
-            observer.observe(targetNode, config);
-        }
-    }, 100);
-
-    function render() {
-        var elements = document
-            .querySelector(".chat-msg-area__vlist")
-            .querySelectorAll(".msg-preview--video");
-
-        for (var video of elements) {
-            let downloadBtn = video.querySelector(".file-progress");
-            video.onclick = () => {
-                downloadBtn.click();
-            };
-        }
+  var observerRendering = false;
+  const observer = new MutationObserver(async (mutationsList) => {
+    for (let mutation of mutationsList) {
+      if (mutation.type === "childList") {
+        if (observerRendering) continue;
+        observerRendering = true;
+        setTimeout(() => {
+          observerRendering = false;
+          render();
+        }, 50);
+      }
     }
+  });
+
+  var finder = setInterval(() => {
+    if (document.querySelector(".ml-list.list")) {
+      clearInterval(finder);
+      console.log(
+        "[Media-Local-View]",
+        "检测到聊天区域，已在当前页面加载视频下载辅助"
+      );
+      const targetNode = document.querySelector(".ml-list.list");
+      const config = {
+        attributes: false,
+        childList: true,
+        subtree: true,
+      };
+      observer.observe(targetNode, config);
+    }
+  }, 100);
+
+  function render() {
+    var elements = document
+      .querySelector(".chat-msg-area__vlist")
+      .querySelectorAll(".msg-preview--video");
+
+    for (var video of elements) {
+      let downloadBtn = video.querySelector(".file-progress");
+      video.onclick = () => {
+        downloadBtn.click();
+      };
+    }
+  }
 }
