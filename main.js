@@ -58,7 +58,7 @@ async function useWindowsQuickLookInner(url) {
           : null;
 
       if (pipePath != null) {
-        pipeClient = net.createConnection(pipePath, () => {
+        var pipeClient = net.createConnection(pipePath, () => {
           pipeClient.write(`QuickLook.App.PipeMessages.Toggle|${url}`);
         });
         pipeClient.on("connect", () => {
@@ -66,26 +66,21 @@ async function useWindowsQuickLookInner(url) {
           accept();
         });
         pipeClient.on("error", (err) => {
-          output("Windows QuickLook pipe error occured", err);
+          output("Error: Windows QuickLook pipe error occured", err);
           reject(
             "连接 Windows QuickLook 出现错误，请确保它已经在后台运行：" +
               JSON.stringify(err)
           );
         });
         pipeClient.on("close", () => {
-          output("Windows QuickLook pipe disconnected");
+          // output("Windows QuickLook pipe disconnected");
         });
       } else {
-        pipeClient = null;
-        nowConfig.windowsQuickLook = false;
-        saveConfig();
+        output("Error: Only support Windows");
         reject("仅支持Windows系统");
       }
     } catch (err) {
       output("Windows QuickLook pipe error occured", err);
-      pipeClient = null;
-      nowConfig.windowsQuickLook = false;
-      saveConfig();
       reject(
         "连接 Windows QuickLook 出现错误，请确保它已经在后台运行：" +
           JSON.stringify(err)
@@ -98,6 +93,8 @@ async function useWindowsQuickLook(url) {
   try {
     await useWindowsQuickLookInner(url);
   } catch (err) {
+    nowConfig.windowsQuickLook = false;
+    saveConfig();
     app.whenReady().then(() => {
       dialog.showMessageBox({
         type: "error",
