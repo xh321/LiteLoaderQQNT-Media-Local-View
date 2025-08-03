@@ -52,9 +52,9 @@ async function useWindowsQuickLookInner(url) {
       pipePath =
         process.platform === "win32"
           ? path.join(
-              "\\\\.\\pipe\\",
-              `QuickLook.App.Pipe.${await getUserSid()}`
-            )
+            "\\\\.\\pipe\\",
+            `QuickLook.App.Pipe.${await getUserSid()}`
+          )
           : null;
 
       if (pipePath != null) {
@@ -69,7 +69,7 @@ async function useWindowsQuickLookInner(url) {
           output("Error: Windows QuickLook pipe error occured", err);
           reject(
             "连接 Windows QuickLook 出现错误，请确保它已经在后台运行：" +
-              JSON.stringify(err)
+            JSON.stringify(err)
           );
         });
         pipeClient.on("close", () => {
@@ -83,7 +83,7 @@ async function useWindowsQuickLookInner(url) {
       output("Windows QuickLook pipe error occured", err);
       reject(
         "连接 Windows QuickLook 出现错误，请确保它已经在后台运行：" +
-          JSON.stringify(err)
+        JSON.stringify(err)
       );
     }
   });
@@ -182,27 +182,45 @@ function onBrowserWindowCreated(window) {
       function ipc_message(_, status, name, ...args) {
         try {
           if (args != null) {
-            if (
-              args.length == 1 &&
-              args[0] != null &&
-              args[0].length == 2 &&
-              args[0][1] != null &&
-              args[0][1].length == 2 &&
-              args[0][1][0] == "openMediaViewer" &&
-              args[0][1][1] != null
-            ) {
-              var mediaList = args[0][1][1].mediaList;
-              var openedPicIndex = args[0][1][1].index;
-              if (mediaList != null && mediaList.length > 0) {
-                var picPath = mediaList[openedPicIndex]?.context?.sourcePath;
-                if (picPath != null && nowConfig.localPic == true) {
-                  localOpen(picPath);
-                  args[0].pop();
-                }
-                var videoPath = mediaList[openedPicIndex]?.context?.video?.path;
-                if (videoPath != null && nowConfig.localVideo == true) {
-                  localOpen(videoPath);
-                  args[0].pop();
+            // 扁平化数组并查找 cmdName 为 "openMediaViewer" 的对象
+            var allObjects = args.flat(Infinity).filter(item =>
+              item &&
+              typeof item === 'object' &&
+              item.cmdName === "openMediaViewer"
+            );
+
+            if (allObjects.length > 0) {
+              var mediaViewerObj = allObjects[0];
+
+              if (mediaViewerObj.payload && mediaViewerObj.payload[0]) {
+                var mediaViewerData = mediaViewerObj.payload[0];
+                var mediaList = mediaViewerData.mediaList;
+                var openedPicIndex = mediaViewerData.index;
+
+                if (mediaList != null && mediaList.length > 0 && openedPicIndex < mediaList.length) {
+                  var currentMedia = mediaList[openedPicIndex];
+
+                  // 处理图片
+                  var picPath = currentMedia?.context?.sourcePath;
+                  if (picPath != null && nowConfig.localPic == true) {
+                    localOpen(picPath);
+                    // 找到包含该对象的最顶层数组
+                    var parentArray = args.find(arr => Array.isArray(arr));
+                    if (parentArray) {
+                      parentArray.pop();
+                    }
+                  }
+
+                  // 处理视频
+                  var videoPath = currentMedia?.context?.video?.path;
+                  if (videoPath != null && nowConfig.localVideo == true) {
+                    localOpen(videoPath);
+                    // 找到包含该对象的最顶层数组
+                    var parentArray = args.find(arr => Array.isArray(arr));
+                    if (parentArray) {
+                      parentArray.pop();
+                    }
+                  }
                 }
               }
             }
